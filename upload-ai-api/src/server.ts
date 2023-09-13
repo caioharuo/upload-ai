@@ -1,8 +1,9 @@
 import { fastifyMultipart } from '@fastify/multipart';
 import fastify from 'fastify';
 
-import { getAllPromptsRoute } from './routes/get-all-prompts';
 import { uploadVideoRoute } from './routes/upload-video';
+import { getAllPromptsRoute } from './routes/get-all-prompts';
+import { createTranscriptionRoute } from './routes/create-transcription';
 
 const app = fastify();
 
@@ -12,8 +13,9 @@ app.register(fastifyMultipart, {
   },
 });
 
-app.register(getAllPromptsRoute);
 app.register(uploadVideoRoute);
+app.register(getAllPromptsRoute);
+app.register(createTranscriptionRoute);
 
 app
   .listen({
