@@ -6,6 +6,7 @@ import { Label } from './ui/label';
 import { Separator } from './ui/separator';
 import { Textarea } from './ui/textarea';
 
+import { api } from '@/lib/axios';
 import { getFFmpeg } from '@/lib/ffmpeg';
 import { fetchFile } from '@ffmpeg/util';
 
@@ -71,7 +72,17 @@ export function VideoInputForm() {
 
     const audioFile = await convertVideoToAudio(videoFile);
 
-    console.log({ audioFile, prompt });
+    const data = new FormData();
+
+    data.append('file', audioFile);
+
+    const response = await api.post('/videos', data);
+
+    const videoId = response.data.video.id;
+
+    await api.post(`/videos/${videoId}/transcription`, {
+      prompt,
+    });
   }
 
   const previewURL = useMemo(() => {
