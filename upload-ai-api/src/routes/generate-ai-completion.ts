@@ -1,9 +1,9 @@
-import { string, z } from 'zod';
-import { createReadStream } from 'node:fs';
+import { z } from 'zod';
 import { FastifyInstance } from 'fastify';
+import { streamToResponse, OpenAIStream } from 'ai';
 
-import { prisma } from '../lib/prisma';
 import { openai } from '../lib/openai';
+import { prisma } from '../lib/prisma';
 
 export async function generateAICompletionRoute(app: FastifyInstance) {
   app.post('/ai/complete', async (request, reply) => {
@@ -36,8 +36,16 @@ export async function generateAICompletionRoute(app: FastifyInstance) {
       model: 'gpt-3.5-turbo-16k',
       temperature,
       messages: [{ role: 'user', content: promptMessage }],
+      stream: true,
     });
 
-    return response;
+    const stream = OpenAIStream(response);
+
+    streamToResponse(stream, reply.raw, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      },
+    });
   });
 }
